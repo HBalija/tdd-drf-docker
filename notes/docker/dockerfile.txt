@@ -1,0 +1,50 @@
+FROM python:3.7-alpine
+
+--> image we inherit (alpine is small image)
+
+
+MAINTAINER HBalija
+
+--> optional
+
+
+ENV PYTHONUNBUFFERED 1
+
+--> run python in unbuffered mode (recomended when using python with Docker); avoids python from buffering output, but to print them directly
+
+
+COPY ./requirements.txt /requirements.txt
+
+--> copy req file from our directory into docker image root
+
+
+RUN pip install -r /requirements.txt
+
+--> install requirements to our container
+
+
+RUN mkdir /app
+
+--> create dir on image which will be used to store source code
+
+
+WORKDIR /app
+
+--> set this dir to working dir (commands are applied from here)
+
+
+COPY ./app /app
+
+--> copy source code to image workdir
+
+
+RUN adduser -D app_user
+
+--> create user called app_user
+
+
+USER app_user
+
+--> change running user to newly created user
+
+----> security purposes (without user image will be run by root account)
