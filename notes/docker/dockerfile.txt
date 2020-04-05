@@ -10,7 +10,8 @@ MAINTAINER HBalija
 
 ENV PYTHONUNBUFFERED 1
 
---> run python in unbuffered mode (recomended when using python with Docker); avoids python from buffering output, but to print them directly
+--> run python in unbuffered mode (recomended when using python with Docker);
+    avoids python from buffering output, but to print it directly
 
 
 COPY ./requirements.txt /requirements.txt
