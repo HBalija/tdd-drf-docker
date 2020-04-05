@@ -1,0 +1,6 @@
+__pycache__
+*.sqlite3
+.env
+.coverage
+html_cov/
+.vscode/
