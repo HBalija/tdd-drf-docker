@@ -1,0 +1,27 @@
+language: python
+
+--> tell travis which programming language we use
+
+
+python:
+  - "3.6"
+
+--> specify python version (but this doesn't matter since we'll run docker container with 3.7)
+
+
+services:
+  - docker
+
+--> specify services we use: only docker here since everything will be
+    specified in our docker configuration
+
+
+before_script: pip install docker-compose
+
+--> anything we run before running tests
+
+
+script:
+  - docker-compose run app sh-c "python manage.py test && flake8"
+
+--> specify our main script: run tests and linting using docker compose

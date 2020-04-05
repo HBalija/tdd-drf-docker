@@ -1,0 +1,8 @@
+continuos integration tool (CI)
+
+- lets us automate some of our tests and check every time we push code to github
+
+(python unit tests, python linting)
+
+
+travis-CI.org
