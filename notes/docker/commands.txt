@@ -11,9 +11,28 @@ docker-compose build
 use docker compose to run service from docker-compose file (app service for us)
 
 docker-compose run <service_name>
-                    (app)
 
     --> anything we add after this command will be run on our docker process
-        sh -c "django-admin.py startproject app ."  --> create new project called app in our current directory
 
-  FULL COMMAND: docker-compose run app sh -c "django-admin.py startproject app ."
+
+
+APP COMMANDS:
+
+current directory: locally - ./app; docker /app --> WORKDIR
+
+create project in current directory:
+    docker-compose run app sh -c "django-admin.py startproject app ."
+
+create core app:
+
+  docker-compose run app sh -c "python manage.py startapp core"
+
+
+migrate the database:
+
+  docker-compose run app sh -c "python manage.py makemigrations && python manage.py migrate"
+
+
+run tests:
+
+  docker-compose run app sh -c "python manage.py test"
