@@ -19,9 +19,27 @@ COPY ./requirements.txt /requirements.txt
 --> copy req file from our directory into docker image root
 
 
+RUN apk add --update --no-cache potgresql-client
+
+--> use alpine package manager (apk) to install postgresql-client; so we have support to postgres
+    --> first update but don't store store registry (to minimize number of files on our image)
+
+
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+  gcc libc-dev linux-headers postgresql-dev
+
+--> run apk to install some temp deps that are required to install postgres python package psycopg2
+--> --virtual <name> --> setup alias for packages installed (".tmp-build-deps" in our case)
+
+
 RUN pip install -r /requirements.txt
 
 --> install requirements to our container
+
+
+RUN apk del .tmp-build-deps
+
+--> delete temp deps using alias
 
 
 RUN mkdir /app

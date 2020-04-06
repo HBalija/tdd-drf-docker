@@ -1,6 +1,8 @@
 version: "3"
 
---> specify version
+#--->
+  - specify version
+-->#
 
 
 services:
@@ -8,26 +10,82 @@ services:
     build:
       context: .
 
---> we have a service called app, and the build section of that service configuration is
-    context of current directory that we're running docker compose from
+  #--->
+    - we have a service called app, and the build section of that service configuration is
+    context of current directory that we're running docker compose from (our Dockerfile)
+  -->#
+
 
     ports:
       - "8000:8000"
 
-    --> we are mapping our app from port 8000 on our host to 8000 on our image
+    #--->
+      - we are mapping our app from port 8000 on our host to 8000 on our image
+    -->#
+
 
     volumes:
       - ./app:/app
 
-    --> allows us to get the updates from our project, to image in real time
-    --> code in our project ./app folder will be synced with /app folder on image
+    #--->
+      - allows us to get the updates from our project, to image in real time
+      - code in our project ./app folder will be synced with /app folder on image
+    -->#
+
 
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
 
-    > --> new line
-    --> command that will run our app on image
-    --> we are using shell to run the command (sh -c)
+    #--->
+      > --> new line
+      - command that will run our app on image
+      - we are using shell to run the command (sh -c)
 
-    python manage.py runserver 0.0.0.0:8000 --> this will run django development server available on all IP addresses (0,0,0,0) that run on docker container on port 8000
-    8000 maps through ports configuration to our local machine
+      python manage.py runserver 0.0.0.0:8000 --> this will run django development server
+      available on all IP addresses (0,0,0,0) that run on docker container on port 8000
+      8000 maps through ports configuration to our local machine
+    -->#
+
+
+    #--->
+     - after we add db service:
+      - setup env variables using same data to setup db service
+    -->#
+
+    environment:
+    - DB_HOST=db                      --> name of db service
+    - DB_NAME=app_db
+    - DB_USER=postgres
+    - DB_PASS=dbpassword
+
+
+    depends_on:
+      - db
+
+    #--->
+      - setup app service to depend on db service (postgres needs to run first)
+      - also, db service will be available on network with HOSTNAME db
+    -->#
+
+
+    #--->
+      - add postgres support to our dockerfile
+    -->#
+
+
+  db:
+    image: postgres:10-alpine
+
+    #--->
+      - creating a new service (db) and pulls image from dockerhub
+    -->#
+
+
+    environment:
+    - POSTGRESS_DB=app
+    - POSTGRESS_USER=postgres
+    - POSTGRESS_PASSWORD=dbpassword
+
+    #--->
+      - setup environment for db service
+    -->#
