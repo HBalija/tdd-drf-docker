@@ -34,16 +34,28 @@ services:
 
 
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000"
 
     #--->
       > --> new line
       - command that will run our app on image
       - we are using shell to run the command (sh -c)
 
-      python manage.py runserver 0.0.0.0:8000 --> this will run django development server
+      - python manage.py wait_for_db --> using our management command to make our db service is
+      ready for connections
+
+      - migrate the db
+
+      - python manage.py runserver 0.0.0.0:8000 --> this will run django development server
       available on all IP addresses (0,0,0,0) that run on docker container on port 8000
       8000 maps through ports configuration to our local machine
+
+      first version command:
+      command: >
+        sh -c "python manage.py runserver 0.0.0.0:8000"
     -->#
 
 

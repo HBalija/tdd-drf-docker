@@ -6,3 +6,9 @@ migrations:
 
 test:
 	docker-compose run app sh -c "python manage.py test && flake8"
+
+up-build:
+	docker-compose up --build
+
+up:
+	docker-compose up
