@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from recipe.models import Tag
+from recipe.models import Ingredient, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -8,4 +8,12 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
+        fields = ('id', 'name')
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    """Serializer for ingredient objec"t"""
+
+    class Meta:
+        model = Ingredient
         fields = ('id', 'name')
