@@ -7,6 +7,8 @@ from django.urls import reverse
 
 
 CREATE_USER_URL = reverse('core:create')
+TOKEN_URL = reverse('core:token')
+
 
 UserModel = get_user_model()
 
@@ -48,3 +50,34 @@ class PublicUserApiTest(TestCase):
         r = self.client.post(CREATE_USER_URL, self.payload)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(UserModel.objects.filter(email=self.payload['email']).exists())
+
+    def test_create_token_for_user(self):
+        """Test that token is created for the user"""
+
+        create_user(**self.payload)
+
+        r = self.client.post(TOKEN_URL, self.payload)
+        self.assertIn('token', r.data)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+    def test_create_token_invalid_credantials(self):
+        """Test that token is not created if invalid credentials"""
+
+        create_user(**self.payload)
+        self.payload['password'] = 'wrong'
+
+        r = self.client.post(TOKEN_URL, self.payload)
+        self.assertNotIn('token', r.data)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_no_user(self):
+        """Test that token is not created if user does not exist"""
+        r = self.client.post(TOKEN_URL, self.payload)
+        self.assertNotIn('token', r.data)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_token_missing_field(self):
+        """Test that email and password are required"""
+        r = self.client.post(TOKEN_URL, {})
+        self.assertNotIn('token', r.data)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
