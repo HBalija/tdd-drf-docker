@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from utils.utils_test_helpers import create_user
 
 CREATE_USER_URL = reverse('core:create')
 TOKEN_URL = reverse('core:token')
@@ -12,10 +13,6 @@ USER_DETAIL_URL = reverse('core:detail')
 
 
 UserModel = get_user_model()
-
-
-def create_user(**params):
-    return UserModel.objects.create_user(**params)
 
 
 class PublicUserApiTest(TestCase):

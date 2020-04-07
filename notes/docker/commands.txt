@@ -31,6 +31,11 @@ create core app:
   docker-compose run app sh -c "python manage.py startapp core"
 
 
+create recipe app:
+
+  docker-compose run --rm app sh -c "python manage.py startapp recipe"
+
+
 migrate the database:
 
   docker-compose run app sh -c "python manage.py makemigrations && python manage.py migrate"
