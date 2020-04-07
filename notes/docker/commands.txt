@@ -13,15 +13,18 @@ use docker compose to run service from docker-compose file (app service for us)
 docker-compose run <service_name>
 
     --> anything we add after this command will be run on our docker process
-
-
+    --> we can include `--rm` before service name to destroy container right away
+        (will be removed on docker compose down anyways but good to know)
+        for example: `docker-compose run --rm app sh -c "python manage.py startapp core"`
 
 APP COMMANDS:
 
 current directory: locally - ./app; docker /app --> WORKDIR
 
+
 create project in current directory:
     docker-compose run app sh -c "django-admin.py startproject app ."
+
 
 create core app:
 
@@ -33,6 +36,21 @@ migrate the database:
   docker-compose run app sh -c "python manage.py makemigrations && python manage.py migrate"
 
 
+create superuser:
+
+  docker-compose run app sh -c "python manage.py createsuperuser"
+
+
 run tests:
 
   docker-compose run app sh -c "python manage.py test"
+
+
+run tests with linting:
+
+  docker-compose run app sh -c "python manage.py test && flake8"
+
+
+run the upp:
+
+  docker-compose up
