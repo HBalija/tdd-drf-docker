@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from utils.utils_test_helpers import create_sample_user
+from utils.help_test_utils import create_user
 
 CREATE_USER_URL = reverse('core:create')
 TOKEN_URL = reverse('core:token')
@@ -34,7 +34,7 @@ class PublicUserApiTest(TestCase):
     def test_user_exists(self):
         """ test creating user that already exists fails """
 
-        create_sample_user(**self.payload)
+        create_user(**self.payload)
         r = self.client.post(CREATE_USER_URL, self.payload)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -47,13 +47,13 @@ class PublicUserApiTest(TestCase):
         self.assertFalse(UserModel.objects.filter(email=self.payload['email']).exists())
 
     def test_create_token_for_user(self):
-        create_sample_user(**self.payload)
+        create_user(**self.payload)
         r = self.client.post(TOKEN_URL, self.payload)
         self.assertIn('token', r.data)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
 
     def test_create_token_invalid_credantials(self):
-        create_sample_user(**self.payload)
+        create_user(**self.payload)
         self.payload['password'] = 'wrong'
         r = self.client.post(TOKEN_URL, self.payload)
         self.assertNotIn('token', r.data)
@@ -84,7 +84,7 @@ class PrivateUserApiTest(TestCase):
             'password': 'password123',
             'name': 'Name'
         }
-        self.user = create_sample_user(**self.payload)
+        self.user = create_user(**self.payload)
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 

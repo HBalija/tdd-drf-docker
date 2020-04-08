@@ -1,7 +1,0 @@
-Dockerfile - file that defines docker image
-
-docker image - a "file" that containes project related data (code)
-
-docker compose  - tool that allows us to run our docker image
-                - allows us join our required services (python, database)
-                - yml file that contains configuration of services that make our project
