@@ -4,3 +4,4 @@ __pycache__
 .coverage
 html_cov/
 .vscode/
+notes/

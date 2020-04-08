@@ -3,34 +3,40 @@ from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from recipe.models import Ingredient, Tag
-from recipe.serializers import IngredientSerializer, TagSerializer
+from recipe.models import Ingredient, Recipe, Tag
+from recipe.serializers import IngredientSerializer, RecipeSerializer, TagSerializer
 
 
 class BaseRecipeAttrViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin):
-    """Base viewset for user owned recipe attributes"""
+    """ Base viewset for user owned recipe attributes """
 
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return filtered queryset by user"""
+        """ Return filtered queryset by user """
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
     def perform_create(self, serializer):
-        """Create a new object"""
         serializer.save(user=self.request.user)
 
 
 class TagViewsSet(BaseRecipeAttrViewSet):
-    """Manage tags in the database"""
-
-    queryset = Tag.objects.all()  # for stupid router both this and get_queryset are required
+    queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
 class IngredientViewsSet(BaseRecipeAttrViewSet):
-    """Manage ingredients in the database"""
-
-    queryset = Ingredient.objects.all()  # for stupid router both this and get_queryset are required
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+
+    serializer_class = RecipeSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Recipe.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
