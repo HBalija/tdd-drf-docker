@@ -14,7 +14,7 @@ Build image from Dockerfile:
 
     docker build .
 
-Build project:
+Build project with compose:
 
     make build
 
