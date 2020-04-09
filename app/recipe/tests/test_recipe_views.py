@@ -145,6 +145,44 @@ class PrivateRecipesApiTests(TestCase):
         self.assertEqual(recipe.tags.count(), 1)
         self.assertEqual(recipe.tags.first(), new_tag)
 
+    def test_filture_recipes_by_tags(self):
+        recipe1 = create_recipe(user=self.user)
+        recipe2 = create_recipe(user=self.user, title='meat cake')
+        recipe3 = create_recipe(user=self.user, title='fruit salad')
+        tag1 = create_tag(user=self.user, name='vegan')
+        tag2 = create_tag(user=self.user, name='meat')
+
+        recipe2.tags.add(tag2)
+        recipe3.tags.add(tag1)
+
+        r = self.client.get(RECIPE_LIST_URL, {'tags': f'{tag1.id},{tag2.id}'})
+
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer3.data, r.data)
+        self.assertIn(serializer2.data, r.data)
+        self.assertNotIn(serializer1.data, r.data)
+
+    def test_fiter_recipes_by_ingredients(self):
+        recipe1 = create_recipe(user=self.user, title='fried chicken')
+        recipe2 = create_recipe(user=self.user, title='squid risotto')
+        recipe3 = create_recipe(user=self.user)
+        ing1 = create_ingredient(user=self.user, name='chicken')
+        ing2 = create_ingredient(user=self.user, name='squid')
+
+        recipe1.ingredients.add(ing1)
+        recipe2.ingredients.add(ing2)
+
+        r = self.client.get(RECIPE_LIST_URL, {'ingredients': f'{ing1.id},{ing2.id}'})
+
+        serializer1 = RecipeSerializer(recipe1)
+        serializer2 = RecipeSerializer(recipe2)
+        serializer3 = RecipeSerializer(recipe3)
+        self.assertIn(serializer1.data, r.data)
+        self.assertIn(serializer2.data, r.data)
+        self.assertNotIn(serializer3.data, r.data)
+
 
 class RecipeImageUploadTests(TestCase):
 
@@ -155,9 +193,9 @@ class RecipeImageUploadTests(TestCase):
         self.recipe = create_recipe(user=self.user)
         self.url = get_image_upload_url(self.recipe.id)
 
-    # def tearDown(self):
-    #     """ Delete all test files after test is done """
-    #     self.recipe.image.delete()
+    def tearDown(self):
+        """ Delete all test files after test is done """
+        self.recipe.image.delete()
 
     def test_upload_image_to_recipe(self):
         """
