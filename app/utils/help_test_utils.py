@@ -35,5 +35,9 @@ def create_recipe(user, **params):
 
 def get_recipe_detail_url(recipe_id):
     """ Return recipe detail url """
-
     return reverse('recipe:recipe-detail', kwargs={'pk': recipe_id})
+
+
+def get_image_upload_url(recipe_id):
+    """ Return URL for recipe image upload """
+    return reverse('recipe:recipe-upload-image', args=[recipe_id])
