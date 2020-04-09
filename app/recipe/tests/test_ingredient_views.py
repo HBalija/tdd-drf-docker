@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from recipe.models import Ingredient
 from recipe.serializers import IngredientSerializer
-from utils.help_test_utils import create_user
+from utils.help_test_utils import create_user, create_ingredient, create_recipe
 
 
 INGREDIENT_LIST_URL = reverse('recipe:ingredient-list')
@@ -68,3 +68,31 @@ class PrivateIngredientsApiTests(TestCase):
         self.payload['name'] = ''
         r = self.client.post(INGREDIENT_LIST_URL, self.payload)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_ingredients_signed_to_recepies(self):
+        ing1 = create_ingredient(user=self.user, name='eggs')
+        ing2 = create_ingredient(user=self.user, name='potato')
+        recipe = create_recipe(user=self.user, title='eggs with ham')
+
+        recipe.ingredients.add(ing1)
+
+        r = self.client.get(INGREDIENT_LIST_URL, {'assigned_only': 1})
+
+        serializer1 = IngredientSerializer(ing1)
+        serializer2 = IngredientSerializer(ing2)
+
+        self.assertIn(serializer1.data, r.data)
+        self.assertNotIn(serializer2.data, r.data)
+
+    def test_retrive_ingredients_assigned_unique(self):
+        ing1 = create_ingredient(user=self.user, name='toast')
+        create_ingredient(user=self.user, name='tomato')
+
+        recipe1 = create_recipe(user=self.user, title='pancakes')
+        recipe2 = create_recipe(user=self.user, title='jam on toast')
+
+        recipe1.ingredients.add(ing1)
+        recipe2.ingredients.add(ing1)
+
+        r = self.client.get(INGREDIENT_LIST_URL, {'assigned_only': 1})
+        self.assertEqual(len(r.data), 1)

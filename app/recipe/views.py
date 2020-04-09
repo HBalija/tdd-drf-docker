@@ -20,7 +20,13 @@ class BaseRecipeAttrViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModel
 
     def get_queryset(self):
         """ Return filtered queryset by user """
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        assigned_only = bool(int(self.request.query_params.get('assigned_only', 0)))
+
+        queryset = self.queryset.filter(user=self.request.user).order_by('-name')
+        if assigned_only:
+            queryset = queryset.filter(recipes__isnull=False).distinct()
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

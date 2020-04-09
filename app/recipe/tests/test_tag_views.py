@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from recipe.models import Tag
 from recipe.serializers import TagSerializer
-from utils.help_test_utils import create_user
+from utils.help_test_utils import create_user, create_recipe, create_tag
 
 
 TAG_LIST_URL = reverse('recipe:tag-list')
@@ -69,3 +69,31 @@ class PrivateTagsApiTests(TestCase):
         self.payload['name'] = ''
         r = self.client.post(TAG_LIST_URL, self.payload)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_tags_signed_to_recepies(self):
+        tag1 = create_tag(user=self.user, name='breakfast')
+        tag2 = create_tag(user=self.user, name='lunch')
+        recipe = create_recipe(user=self.user, title='eggs with ham')
+
+        recipe.tags.add(tag1)
+
+        r = self.client.get(TAG_LIST_URL, {'assigned_only': 1})
+
+        serializer1 = TagSerializer(tag1)
+        serializer2 = TagSerializer(tag2)
+
+        self.assertIn(serializer1.data, r.data)
+        self.assertNotIn(serializer2.data, r.data)
+
+    def test_retrive_tags_assigned_unique(self):
+        tag1 = create_tag(user=self.user, name='breakfast')
+        create_tag(user=self.user, name='lunch')
+
+        recipe1 = create_recipe(user=self.user, title='pancakes')
+        recipe2 = create_recipe(user=self.user, title='jam on toast')
+
+        recipe1.tags.add(tag1)
+        recipe2.tags.add(tag1)
+
+        r = self.client.get(TAG_LIST_URL, {'assigned_only': 1})
+        self.assertEqual(len(r.data), 1)
